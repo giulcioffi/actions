@@ -27,6 +27,7 @@ def get_compilesketches_object(
     github_token="",
     report_sketch=unittest.mock.sentinel.report_sketch,
     enable_size_deltas_report="false",
+    continue_on_error="false",
     sketches_report_path="foo report_folder_name"
 ):
     return compilesketches.CompileSketches(cli_version=cli_version,
@@ -38,6 +39,7 @@ def get_compilesketches_object(
                                            github_token=github_token,
                                            report_sketch=report_sketch,
                                            enable_size_deltas_report=enable_size_deltas_report,
+                                           continue_on_error=continue_on_error,
                                            sketches_report_path=sketches_report_path)
 
 
@@ -85,6 +87,7 @@ def test_main(capsys, monkeypatch, mocker, use_size_deltas_report_folder_name, e
     github_token = "FooGitHubToken"
     report_sketch = "FooReportSketch"
     enable_size_deltas_report = "true"
+    continue_on_error = "true"
     sketches_report_path = "FooSketchesReportPath"
     size_deltas_report_folder_name = "FooSizeDeltasReportFolderName"
 
@@ -101,6 +104,7 @@ def test_main(capsys, monkeypatch, mocker, use_size_deltas_report_folder_name, e
     monkeypatch.setenv("INPUT_VERBOSE", verbose)
     monkeypatch.setenv("INPUT_SIZE-REPORT-SKETCH", report_sketch)
     monkeypatch.setenv("INPUT_ENABLE-SIZE-DELTAS-REPORT", enable_size_deltas_report)
+    monkeypatch.setenv("INPUT_CONTINUE-ON-ERROR", continue_on_error)
     monkeypatch.setenv("INPUT_SKETCHES-REPORT-PATH", sketches_report_path)
     if use_size_deltas_report_folder_name:
         monkeypatch.setenv("INPUT_SIZE-DELTAS-REPORT-FOLDER-NAME", size_deltas_report_folder_name)
@@ -139,6 +143,7 @@ def test_main(capsys, monkeypatch, mocker, use_size_deltas_report_folder_name, e
         github_token=github_token,
         report_sketch=report_sketch,
         enable_size_deltas_report=enable_size_deltas_report,
+        continue_on_error=continue_on_error,
         sketches_report_path=expected_sketches_report_path
     )
     CompileSketches.compile_sketches.assert_called_once()
@@ -157,6 +162,7 @@ def test_compilesketches():
     github_token = "fooGitHubToken"
     report_sketch = unittest.mock.sentinel.report_sketch
     enable_size_deltas_report = "true"
+    continue_on_error = "true"
     sketches_report_path = "FooSketchesReportFolder"
 
     compile_sketches = compilesketches.CompileSketches(
@@ -169,6 +175,7 @@ def test_compilesketches():
         github_token=github_token,
         report_sketch=report_sketch,
         enable_size_deltas_report=enable_size_deltas_report,
+        continue_on_error=continue_on_error,
         sketches_report_path=sketches_report_path
     )
 
@@ -181,6 +188,7 @@ def test_compilesketches():
     assert compile_sketches.verbose is False
     assert compile_sketches.report_sketch == report_sketch
     assert compile_sketches.enable_size_deltas_report is True
+    assert compile_sketches.continue_on_error is True
     assert compile_sketches.sketches_report_path == pathlib.PurePath(sketches_report_path)
 
     # Test invalid enable_size_deltas_report value

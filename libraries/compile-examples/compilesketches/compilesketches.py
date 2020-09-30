@@ -39,6 +39,7 @@ def main():
         github_token=os.environ["INPUT_GITHUB-TOKEN"],
         report_sketch=os.environ["INPUT_SIZE-REPORT-SKETCH"],
         enable_size_deltas_report=os.environ["INPUT_ENABLE-SIZE-DELTAS-REPORT"],
+        continue_on_error=os.environ["INPUT_CONTINUE-ON-ERROR"],
         sketches_report_path=os.environ["INPUT_SKETCHES-REPORT-PATH"]
     )
 
@@ -61,6 +62,8 @@ class CompileSketches:
     report_sketch -- name of the sketch to make the report for
     enable_size_deltas_report -- set to "true" to cause the action to determine the change in memory usage for the
                                  report_sketch ("true", "false")
+    continue_on_error -- set to "true" to cause the action to check against the expected results database and do not show a
+                                failure if a sketch fails but was expected to do so ("true", "false")
     sketches_report_path -- folder to save the sketches report to
     """
 
@@ -99,7 +102,7 @@ class CompileSketches:
     latest_release_indicator = "latest"
 
     def __init__(self, cli_version, fqbn_arg, platforms, libraries, sketch_paths, verbose, github_token, report_sketch,
-                 enable_size_deltas_report, sketches_report_path):
+                 enable_size_deltas_report, continue_on_error, sketches_report_path):
         """Process, store, and validate the action's inputs."""
         self.cli_version = cli_version
 
@@ -130,9 +133,19 @@ class CompileSketches:
             print("::error::Invalid value for enable-size-deltas-report input")
             sys.exit(1)
 
+        self.continue_on_error = parse_boolean_input(boolean_input=continue_on_error)
+        # The continue-on-error input has a default value so it should always be either True or False
+        if self.continue_on_error is None:
+            print("::error::Invalid value for continue-on-error input")
+            sys.exit(1)
+
         self.sketches_report_path = pathlib.PurePath(sketches_report_path)
 
         if self.enable_size_deltas_report and self.report_sketch == "":
+            print("::error::size-report-sketch input was not defined")
+            sys.exit(1)
+
+        if self.continue_on_error and self.report_sketch == "":
             print("::error::size-report-sketch input was not defined")
             sys.exit(1)
 

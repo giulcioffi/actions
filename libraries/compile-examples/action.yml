@@ -31,6 +31,9 @@ inputs:
   enable-size-deltas-report:
     description: 'Set to true to cause the action to determine the change in memory usage for the size-reports-sketch'
     default: false
+  continue-on-error:
+    description: 'Set to true to cause the action to check the compilation results against the database of expected results'
+    default: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
